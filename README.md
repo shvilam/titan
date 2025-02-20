@@ -54,10 +54,17 @@ Before setting up the project, ensure you have the following installed:
     This script will:
     - Install dependencies for both the client and server.
     - Create the MySQL database and table.
-
+## Running e2e on the app 
+to start e2e test that render the compnent fetch data from server and render it us the test are located in 
+```sh
+client\src\test\component.test.js
+ ```
+run
+ ```sh
+npm run test
+ ```
 ## Running the Application
-
 To start both the client and server, run:
  ```sh
-    npm run start
+npm run start
 ```
