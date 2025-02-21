@@ -1,42 +1,27 @@
 const fetch = require('node-fetch');
 require('dotenv').config();
 const { upsetQuotes } = require('./quotes-dal');
-
+const {RateLimiter}  = require('./rate_limiter')
 const FETCH_PER_INTERVAL = 30;
+const RATE_LIMIT_SLIDING_WINDOW = 20 * 1000
 const url = `https://favqs.com/api/quotes`;
 
-const triggerNextFetchInterval = (page) => {
-  console.log('timeout for 20s will trigger next fetch interval', {page});  
-  setTimeout(()=> {
-    handleNextFetch(page, 1);
-  }, 20*1000)
-}
-const initQuotesFetcher = () => {
-    handleNextFetch(1, 1);
+
+const initQuotesFetcher = async () => {
+    let pageIndex = 1;
+    let hasMorePages = true;
+    const rateLimiter = new RateLimiter(3, RATE_LIMIT_SLIDING_WINDOW); //30 calls in 20 secand
+    while(hasMorePages) 
+      const res = await rateLimiter.limit(fetchQuotes.bind(null, pageIndex));
+      console.log('fetched new page', {page: res.page, numberQuotes: res.quotes.length});
+      upsetQuotes(res.quotes); // not wating for inserting qoutes in case that if failed we will lose the data
+                               // maybe a Q could have sloved it
+      hasMorePages = !res.last_page;
+      pageIndex++;
+    } 
+    console.log('fetch all pages ', pageIndex);
 }
 
-const handleNextFetch = async (page, currentFetch) => {
-  let isLastPage = false;
-  if (currentFetch < FETCH_PER_INTERVAL) {
-    try {
-        const res = await fetchQuotes(page);
-        console.log('fetch new page', {page: res.page, numberQuotes: res.quotes.length, currentFetch});
-        await upsetQuotes(res.quotes);
-        isLastPage = res.last_page
-        page++;
-    } catch (error) {
-      console.error(error);
-    } finally {
-        if (isLastPage === false) {
-            handleNextFetch(page, currentFetch + 1);
-        } else {
-            console.log('LAST PAGE REACHED!!!!');
-        }
-    }
-  } else {
-    triggerNextFetchInterval(page);
-  }
-};
 const fetchQuotes = async (page) => {
   try {
     const response = await fetch(url+"?page="+page, {
@@ -45,8 +30,7 @@ const fetchQuotes = async (page) => {
         'Authorization': `Token token="${process.env.FAVQS_KEY}"`
       }
     });
-    const data = await response.json();
-    return data;
+    return await response.json();
   } catch (error) {
     console.error(error);
     throw error;

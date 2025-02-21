@@ -15,22 +15,22 @@ const db = mysql.createConnection({
     }
     console.log('connected as id ' + db.threadId);
   });
+  
 const upsetQuotes = async (quotes) => {
   if (!quotes || quotes.length === 0) {
     return;
   }
   const values = quotes.map(quote => [quote.id, Buffer.from(JSON.stringify(quote))]);
-  console.log('IDs:', quotes.map(quote => quote.id).join(', '));
+  console.log('IDs:', quotes.map(quote => quote.id).join(', '),'BUG - same id return in diffrent pages');
   const placeholders = values.map(() => '(?, ?)').join(', ');
   const query = `INSERT IGNORE INTO quotes (id, data) VALUES ${placeholders}`;
   const flattenedValues = values.flat();
-
   db.query(query, flattenedValues, (err, result) => {
     if (err) {
       console.error(err);
       throw new Error(err);
     } else {
-      console.log('Data inserted', result.affectedRows);
+      console.log('row inserted', result.affectedRows);
     }
   });
 }
