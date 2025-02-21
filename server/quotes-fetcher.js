@@ -10,7 +10,7 @@ const url = `https://favqs.com/api/quotes`;
 const initQuotesFetcher = async () => {
     let pageIndex = 1;
     let hasMorePages = true;
-    const rateLimiter = new RateLimiter(3, RATE_LIMIT_SLIDING_WINDOW); //30 calls in 20 secand
+    const rateLimiter = new RateLimiter(FETCH_PER_INTERVAL, RATE_LIMIT_SLIDING_WINDOW); //30 calls in 20 secand
     while(hasMorePages) 
       const res = await rateLimiter.limit(fetchQuotes.bind(null, pageIndex));
       console.log('fetched new page', {page: res.page, numberQuotes: res.quotes.length});
