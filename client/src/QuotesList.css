@@ -1,0 +1,31 @@
+.quotes-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.quote-item {
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.quote-author {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.quote-body {
+    font-style: italic;
+    margin-bottom: 10px;
+}
+
+.quote-link {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.quote-link:hover {
+    text-decoration: underline;
+}
